@@ -1,7 +1,7 @@
 #ddev-generated
-# Example Pantheon.io provider configuration.
-# This example is Drupal/drush oriented,
-# but can be adapted for other CMSs supported by Pantheon
+# Pantheon.io provider configuration.
+# Requirements:
+# - https://github.com/pantheon-systems/terminus-rsync-plugin
 
 # To use this configuration:
 #
@@ -11,37 +11,40 @@
 #
 #    ```
 #    web_environment:
-#    - TERMINUS_MACHINE_TOKEN=abcdeyourtoken
+#    - TERMINUS_MACHINE_TOKEN=xxxxxxxxxxxxxxx
 #    ```
+#    You can also do this with `ddev config global --web-environment-add="TERMINUS_MACHINE_TOKEN=xxxxxxxxxxxxxxx"`.
 #
-# 2. Choose a Pantheon site and environment you want to use with ddev. You can usually use the site name, but in some environments you may need the site uuid, which is the long 3rd component of your site dashboard URL. So if the site dashboard is at <https://dashboard.pantheon.io/sites/009a2cda-2c22-4eee-8f9d-96f017321555#dev/>, the site ID is 009a2cda-2c22-4eee-8f9d-96f017321555.
+# 2. On the pantheon dashboard, make sure that at least one backup has been created. (When you need to refresh what you pull, do a new backup.)
 #
-# 3. On the pantheon dashboard, make sure that at least one backup has been created. (When you need to refresh what you pull, do a new backup.)
+# 3. Make sure your public ssh key is configured in Pantheon (Account->SSH Keys)
 #
-# 4. Make sure your public ssh key is configured in Pantheon (Account->SSH Keys)
+# 4. Check out project codebase from Pantheon. Enable the "Git Connection Mode" and use `git clone` to check out the code locally.
 #
-# 5. Check out project codebase from Pantheon. Enable the "Git Connection Mode" and use `git clone` to check out the code locally.
+# 5. Configure the local checkout for ddev using `ddev config`
 #
 # 6. Verify that drush is installed in your project, `ddev composer require drush/drush`
 #
-# 7. Configure the local checkout for ddev using `ddev config`
+# 7. Add the PROJECT environment variable to your project `.ddev/config.yaml`, for example:
+#    ```yaml
+#    web_environment:
+#        - PROJECT=project1.dev
+#    ```
+#    You can also do this with `ddev config --web-environment-add="PROJECT=project1.dev"`.
 #
-# 8. In your project's .ddev/providers directory, copy pantheon.yaml.example to pantheon.yaml and edit the "project" under `environment_variables` (change it from `yourproject.dev`). If you want to use a different environment than "dev", change `dev` to the name of the environment.
+#    On Pantheon you can use the site name, but in some environments you may need the site uuid, which is the long 3rd component of your site dashboard URL. So if the site dashboard is at <https://dashboard.pantheon.io/sites/009a2cda-2c22-4eee-8f9d-96f017321555#dev/>, the site ID is 009a2cda-2c22-4eee-8f9d-96f017321555.
 #
-# 9. If using Colima, may need to set an explicit nameserver in `~/.colima/default/colima.yaml` like `1.1.1.1`. If this configuration is changed, may also need to restart Colima.
+# 8. If using Colima, may need to set an explicit nameserver in `~/.colima/default/colima.yaml` like `1.1.1.1`. If this configuration is changed, may also need to restart Colima.
 #
-# 10. `ddev restart`
+# 9. `ddev restart`
 #
-# 11. Run `ddev pull pantheon`. The ddev environment will download the Pantheon database and files using terminus and will import the database and files into the ddev environment. You should now be able to access the project locally.
+# 10. Run `ddev pull pantheon`. The ddev environment will download the Pantheon database and files using terminus and will import the database and files into the ddev environment. You should now be able to access the project locally.
 #
-# 12. Optionally use `ddev push pantheon` to push local files and database to Pantheon. Note that `ddev push` is a command that can potentially damage your production site, so this is not recommended.
+# 11. Optionally use `ddev push pantheon` to push local files and database to Pantheon. Note that `ddev push` is a command that can potentially damage your production site, so this is not recommended.
 #
 
 # Debugging: Use `ddev exec terminus auth:whoami` to see what terminus knows about
 # `ddev exec terminus site:list` will show available sites
-
-environment_variables:
-  project: yourproject.dev
 
 auth_command:
   command: |
@@ -56,17 +59,17 @@ db_pull_command:
   command: |
     set -x   # You can enable bash debugging output by uncommenting
     set -eu -o pipefail
-    ls /var/www/html/.ddev >/dev/null # This just refreshes stale NFS if possible
     pushd /var/www/html/.ddev/.downloads >/dev/null
-    terminus backup:get ${project} --element=db --to=db.sql.gz
+    terminus backup:create ${PROJECT} --element=db
+    terminus backup:get ${PROJECT} --element=db --to=db.sql.gz
 
 files_pull_command:
   command: |
     set -x   # You can enable bash debugging output by uncommenting
     set -eu -o pipefail
-    ls /var/www/html/.ddev >/dev/null # This just refreshes stale NFS if possible
     pushd /var/www/html/.ddev/.downloads >/dev/null;
-    terminus backup:get ${project} --element=files --to=files.tgz
+    terminus backup:create ${PROJECT} --element=files
+    terminus backup:get ${PROJECT} --element=files --to=files.tgz
     mkdir -p files && tar --strip-components=1 -C files -zxf files.tgz
 
 # push is a dangerous command. If not absolutely needed it's better to delete these lines.
@@ -74,10 +77,9 @@ db_push_command:
   command: |
     set -x   # You can enable bash debugging output by uncommenting
     set -eu -o pipefail
-    ls /var/www/html/.ddev >/dev/null # This just refreshes stale NFS if possible
     pushd /var/www/html/.ddev/.downloads >/dev/null;
-    terminus remote:drush ${project} -- sql-drop -y
-    gzip -dc db.sql.gz | terminus remote:drush ${project} -- sql-cli
+    terminus remote:drush ${PROJECT} -- sql-drop -y
+    gzip -dc db.sql.gz | terminus remote:drush ${PROJECT} -- sql-cli
 
 # push is a dangerous command. If not absolutely needed it's better to delete these lines.
 files_push_command:
