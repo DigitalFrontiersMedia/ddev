@@ -29,12 +29,21 @@ If you have DDEV installed, and have an active Pantheon account with an active s
 
 7. If using Drupal 8+, verify that Drush is installed in your project with `ddev composer require drush/drush`. If using Drupal 6 or 7, Drush 8 is already provided in the web container’s `/usr/local/bin/drush`, so you can skip this step.
 
-8. In your **project’s** `.ddev/providers` directory, copy `pantheon.yaml.example` to `pantheon.yaml` (*This refers to your project `.ddev` folder and not the global `.ddev` folder*).  Edit the `project` environment variable under `environment_variables`. It will be in the format `<projectname>.<environment>`, for example `yourprojectname.dev` or (in cases of ambiguity) `<project_uuid>.<environment>`, for example `009a2cda-2c22-4eee-8f9d-96f017321555.dev`.
+8. In your **project’s** `.ddev/providers` directory, copy `pantheon.yaml.example` to `pantheon.yaml` (*This refers to your project `.ddev` folder and not the global `.ddev` folder*).
 
-9. If using Colima, may need to set an explicit nameserver in `~/.colima/default/colima.yaml` like `1.1.1.1`. If this configuration is changed, may also need to restart Colima.
+9. Add the `PROJECT` environment variable to your project's configuration, for example in `.ddev/config.yaml`):
+    ```yaml
+    web_environment:
+        - PROJECT=project1.dev
+    ```
+    You can also do this with `ddev config --web-environment-add="PROJECT=project1.dev"`.
 
-10. Run [`ddev restart`](../usage/commands.md#restart).
+    On Pantheon you can use the site name, but in some environments you may need the site uuid, which is the long 3rd component of your site dashboard URL. So if the site dashboard is at <https://dashboard.pantheon.io/sites/009a2cda-2c22-4eee-8f9d-96f017321555#dev/>, the site ID is 009a2cda-2c22-4eee-8f9d-96f017321555.
 
-11. Run `ddev pull pantheon`. DDEV will download the Pantheon database and files and bring them into the local DDEV environment. You should now be able to access the project locally.
+10. If using Colima, may need to set an explicit nameserver in `~/.colima/default/colima.yaml` like `1.1.1.1`. If this configuration is changed, may also need to restart Colima.
 
-12. Optionally use `ddev push pantheon` to push local files and database to Pantheon. The [`ddev push`](../usage/commands.md#push) command can potentially damage your production site, so we don’t recommend using it.
+11. Run [`ddev restart`](../usage/commands.md#restart).
+
+12. Run `ddev pull pantheon`. DDEV will download the Pantheon database and files and bring them into the local DDEV environment. You should now be able to access the project locally.
+
+13. Optionally use `ddev push pantheon` to push local files and database to Pantheon. The [`ddev push`](../usage/commands.md#push) command can potentially damage your production site, so we don’t recommend using it.
