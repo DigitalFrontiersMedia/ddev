@@ -40,13 +40,13 @@ If you have DDEV installed, and have an active Pantheon account with an active s
 8. In your **project’s** `.ddev/providers` directory, copy `pantheon.yaml.example` to `pantheon.yaml` (*This refers to your project `.ddev` folder and not the global `.ddev` folder*).
 
 9. Add the `PROJECT` environment variable to your project's configuration, for example in `.ddev/config.yaml`):
-    ```yaml
-    web_environment:
-        - PROJECT=project1.dev
-    ```
-    You can also do this with `ddev config --web-environment-add="PROJECT=project1.dev"`.
+   ```yaml
+   web_environment:
+       - PROJECT=project1.dev
+   ```
+   You can also do this with `ddev config --web-environment-add="PROJECT=project1.dev"`.
 
-    On Pantheon you can use the site name, but in some environments you may need the site uuid, which is the long 3rd component of your site dashboard URL. So if the site dashboard is at <https://dashboard.pantheon.io/sites/009a2cda-2c22-4eee-8f9d-96f017321555#dev/>, the site ID is 009a2cda-2c22-4eee-8f9d-96f017321555.
+   On Pantheon you can use the site name, but in some environments you may need the site uuid, which is the long 3rd component of your site dashboard URL. So if the site dashboard is at <https://dashboard.pantheon.io/sites/009a2cda-2c22-4eee-8f9d-96f017321555#dev/>, the site ID is 009a2cda-2c22-4eee-8f9d-96f017321555.
 
 10. If using Colima, may need to set an explicit nameserver in `~/.colima/default/colima.yaml` like `1.1.1.1`. If this configuration is changed, may also need to restart Colima.
 
