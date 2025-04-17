@@ -1,5 +1,7 @@
 #ddev-generated
 # Pantheon.io provider configuration.
+# Requirements:
+# - https://github.com/pantheon-systems/terminus-rsync-plugin
 
 # To use this configuration:
 #
